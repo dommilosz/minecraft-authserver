@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/secure/authserver.js"></script>
+</head>
+<body>
+<select id="accTypeSelect" onchange="changeAccountType(event.target.value)">
+    <option value="microsoft">Microsoft</option>
+    <option value="mojang">Mojang</option>
+    <option value="token">Token</option>
+</select>
+
+<div id="creator">
+    <a style="" class="acc_prop microsoft" id="msUrl" target="_blank">Microsoft url</a>
+    <input type="text" placeholder="code_username" class="acc_prop all" id="code_username" style="">
+    <input type="text" placeholder="code_password" class="acc_prop all" id="code_password" style="">
+    <input type="text" placeholder="username" class="acc_prop mojang" id="username" style="display: none;">
+    <input type="text" placeholder="password" class="acc_prop mojang" id="password" style="display: none;">
+    <input style="display:none" type="text" placeholder="token" class="acc_prop token" id="token">
+    <input style="" type="text" placeholder="code" class="acc_prop microsoft" id="code">
+    <button onclick="addAccountDOM()">ADD</button>
+</div>
+
+<script>
+    let msUrl = "";
+    fetch('/secure/authserver-msurl').then(r=>r.text()).then((r)=>{
+        msUrl=r
+        document.querySelector('#msUrl').href = msUrl;
+    })
+    changeAccountType(document.querySelector('#accTypeSelect').value)
+</script>
+</body>
+</html>
