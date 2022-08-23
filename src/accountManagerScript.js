@@ -77,6 +77,7 @@ function openIframe(url, title) {
     if (url === '') {
         document.querySelector("#iframe").src = url;
         document.querySelector("#iframe_container").style.display = 'none';
+        fetchAccounts();
         return;
     }
     document.querySelector("#iframe").src = url;
@@ -314,7 +315,10 @@ async function fetchAccount() {
 
     buttons.forEach((btn) => {
         let button = document.createElement("button");
-        button.onclick = btn.onClick;
+        button.onclick = async ()=>{
+            await btn.onClick();
+            fetchAccount()
+        };
         button.innerHTML = btn.text;
         button.className = `btn btn-${btn.type??"primary"}`;
         button.style.marginRight = '5px'
