@@ -4,14 +4,34 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="/secure/authserver.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js" defer></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js" defer></script>
+
+    <!-- Bootflat's JS files.-->
+    <script src="https://bootflat.github.io/bootflat/js/icheck.min.js" defer></script>
+    <script src="https://bootflat.github.io/bootflat/js/jquery.fs.selecter.min.js" defer></script>
+    <script src="https://bootflat.github.io/bootflat/js/jquery.fs.stepper.min.js" defer></script>
+
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://bootflat.github.io/bootflat/css/bootflat.css">
 </head>
 <body>
-<div id="data">
 
-</div>
-<div id="actions">
+<div class="panel panel-default">
+    <table class="table" id="accountContainer">
+        <thead>
+        <tr>
+            <th>Property</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
 
+        </tbody>
+    </table>
 </div>
+
 
 <script>fetchAccount()</script>
 </body>
