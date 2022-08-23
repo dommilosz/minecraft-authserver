@@ -12,10 +12,10 @@ Main panel:
 ![demo.png](media/demo.png)
 
 Account creator:
-![account editor.png](media/account editor.png)
+![account editor.png](media/account-editor.png)
 
 Account editor:
-![account editor.png](media/account editor.png)
+![account editor.png](media/account-editor.png)
 
 ### Example config
 fileLocation can be `local` or firebase realtime database url.
