@@ -41,7 +41,7 @@ readJSON("authserver-tokens.json").then(data=>{
 });
 
 app.use(json({limit: '50mb'}));
-app.use("/secure",securedRoutes);
+app.use(securedRoutes);
 
 export async function deserialize() {
     let data = await readJSON("authserver-accounts.json");

@@ -3,7 +3,7 @@ let mojang_icon = ' data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAA
 let microsoft_icon = ' data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAANlBMVEXzUyWBvAYFpvD/ugj////0+e7u9/3yQwD+8u93uAD/+O4An+//tQDxLgD+8O5tswAAme7/sQD0iHshAAABGElEQVR4nO3P2xGCQBQFwauCyEPU/JP1y1oiOOVqTwJTXRVrug2fxvkUKwckJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/ELhFOu+N+FjjlV7rqE15qrh1yPsP8L+I+w/wv6ra67DdslVa6xnIy6vLVadY60H4XaJRUhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISPjPwjf4OYDLORB8DwAAAABJRU5ErkJggg=='
 
 async function fetchAccounts() {
-    let accountsRaw = await fetch("/secure/authserver-rawAccounts");
+    let accountsRaw = await fetch("/authserver-rawAccounts");
     let accounts = await accountsRaw.json();
 
     let accountsDiv = document.querySelector("#accountsContainer > tbody");
@@ -26,7 +26,7 @@ async function fetchAccounts() {
 
     accountsDiv.innerHTML += `<tr>
             <td>-</td>
-            <td><button onclick="openIframe('/secure/authserver/add','Add Account')" class="btn btn-info btn-block">Add</button></td>
+            <td><button onclick="openIframe('/authserver/add','Add Account')" class="btn btn-info btn-block">Add</button></td>
         </tr>`
 }
 
@@ -56,7 +56,7 @@ async function addAccount(type, props) {
     let body = props;
     body["type"] = type;
 
-    let resp = await (await fetch('/secure/authserver-addAccount', {
+    let resp = await (await fetch('/authserver-addAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ async function accountActionUse(username) {
         code_username: username,
         action: "use"
     }
-    let resp = await (await fetch('/secure/authserver-accountAction', {
+    let resp = await (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -105,7 +105,7 @@ async function accountActionRefresh(username) {
         code_username: username,
         action: "refresh"
     }
-    let resp = await (await fetch('/secure/authserver-accountAction', {
+    let resp = await (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -122,7 +122,7 @@ async function accountActionLogin(username) {
         username: prompt("username"),
         password: prompt("password"),
     }
-    let resp = await (await fetch('/secure/authserver-accountAction', {
+    let resp = await (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -138,7 +138,7 @@ async function accountActionAuthFlow(username) {
         action: "authFlow",
         code: prompt("code"),
     }
-    let resp = await (await fetch('/secure/authserver-accountAction', {
+    let resp = await (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -153,7 +153,7 @@ async function accountActionGetProfile(username) {
         code_username: username,
         action: "profile",
     }
-    let resp = await (await fetch('/secure/authserver-accountAction', {
+    let resp = await (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -168,7 +168,7 @@ async function accountActionOwnership(username) {
         code_username: username,
         action: "ownership",
     }
-    let resp = await (await fetch('/secure/authserver-accountAction', {
+    let resp = await (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -183,7 +183,7 @@ async function accountActionValidateToken(username) {
         code_username: username,
         action: "validateToken",
     }
-    let resp = await (await fetch('/secure/authserver-accountAction', {
+    let resp = await (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -198,7 +198,7 @@ async function deleteAccount(username) {
     let body = {
         code_username: username,
     }
-    let resp = await (await fetch('/secure/authserver-removeAccount', {
+    let resp = await (await fetch('/authserver-removeAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -214,7 +214,7 @@ async function editAccount(username) {
         code_username_new: prompt("new username"),
         code_password_new: prompt("new password"),
     }
-    let resp = await (await fetch('/secure/authserver-editAccount', {
+    let resp = await (await fetch('/authserver-editAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -230,7 +230,7 @@ async function editAccountAltPasswords(username) {
         code_username: username,
         alternative_passwords: alt_pass.length>1?alt_pass.split(";"):[],
     }
-    let resp = await (await fetch('/secure/authserver-editAccount', {
+    let resp = await (await fetch('/authserver-editAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -276,7 +276,7 @@ function createProperiesTable(obj, nesting = "") {
 }
 
 async function fetchAccount() {
-    let accountsRaw = await fetch("/secure/authserver-rawAccounts");
+    let accountsRaw = await fetch("/authserver-rawAccounts");
     let accounts = await accountsRaw.json();
 
     let dataElement = document.querySelector("#accountContainer > tbody");
@@ -327,7 +327,7 @@ async function fetchAccount() {
 }
 
 function openAccount(username) {
-    openIframe("/secure/authserver/view#" + username, "Edit Account: " + username);
+    openIframe("/authserver/view#" + username, "Edit Account: " + username);
 }
 
 function openMSAuth() {

@@ -223,6 +223,10 @@ securedRoutes.get("/authserver-msUrl", async(req:Request, res:Response) => {
 securedRoutes.get("/authserver", async(req:Request, res:Response) => {
     await sendFile(req, res, 'src/accountManager.html', 200)
 })
+securedRoutes.get("/", async(req:Request, res:Response) => {
+    await sendFile(req, res, 'src/accountManager.html', 200)
+})
+
 securedRoutes.get("/authserver/add", async(req:Request, res:Response) => {
     await sendFile(req, res, 'src/addAccount.html', 200)
 })
