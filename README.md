@@ -7,6 +7,10 @@ There is web ui at endpoint /
 It supports Mojang, Microsoft and Token based accounts. 
 Cracked accounts have no point to be added.
 
+Web UI is protected by basic http auth. Username is admin and password is set in config. Default `root` password cannot be used.  
+
+Files can be stored locally or in firebase realtime database. If you want to use rtdb place firebase-secrets.json in root directory and in fileLocation in config enter your rtdb url.
+
 ### Demo of web UI
 Main panel:
 ![demo.png](media/demo.png)
