@@ -6,34 +6,48 @@ import configured from "configuredjs";
 
 export const config = configured({
     path: "config.json", writeMissing: true, defaultConfig: {
-        port:8080,
-        rateLimits:{
-            window:15 * 60,
-            limit:30
+        port: 8080,
+        rateLimits: {
+            window: 15 * 60,
+            limit: 30
         },
-        fileLocation:"local",
-        password:"root",
-        ms:{
-            appID:"",
-            appSecret:"",
-            redirectUrl:"",
+        fileLocation: "local",
+        password: "root",
+        ms: {
+            appID: "",
+            appSecret: "",
+            redirectUrl: "",
         }
     }
 })
 
 
-MicrosoftAuth.setup(config.ms.appID,config.ms.appSecret,config.ms.redirectUrl);
+MicrosoftAuth.setup(config.ms.appID, config.ms.appSecret, config.ms.redirectUrl);
 
 import {readJSON, writeJSON} from "./fileSystem";
 import {securedRoutes} from "./accountManager";
+import * as Crypto from "crypto";
 
 const app = express()
 export let accStore = new AccountsStorage();
-let validTokens:any;
+let _validTokens: { [key: string]: { uuid: string, accessToken: string } };
 
-readJSON("authserver-tokens.json").then(data=>{
-    validTokens = data;
-    deserialize().then(()=>{
+function createHash(input: string) {
+    return Crypto.createHash('sha256').update(input).digest('base64');
+}
+
+function getValidTokens(accessToken: string) {
+    return _validTokens[createHash(accessToken)];
+}
+
+async function setValidTokens(accessToken: string, value: { uuid: string; accessToken: string }) {
+    _validTokens[createHash(accessToken)] = value;
+    await writeJSON('authserver-tokens.json', _validTokens);
+}
+
+readJSON("authserver-tokens.json").then(data => {
+    _validTokens = data;
+    deserialize().then(() => {
         app.listen(config.port, () => {
             console.log(`App listening on port ${config.port}`)
         })
@@ -45,7 +59,7 @@ app.use(json({limit: '50mb'}));
 export async function deserialize() {
     let data = await readJSON("authserver-accounts.json");
     if (data.length < 1) return;
-    accStore = AccountsStorage.deserialize(JSON.stringify(data.accounts??[]));
+    accStore = AccountsStorage.deserialize(JSON.stringify(data.accounts ?? []));
 }
 
 export async function serialize() {
@@ -53,8 +67,8 @@ export async function serialize() {
     await writeJSON("authserver-accounts.json", {accounts: JSON.parse(data)});
 }
 
-export function findAccountByUsername(username:string):Account|undefined {
-    let matching:Account|undefined = undefined;
+export function findAccountByUsername(username: string): Account | undefined {
+    let matching: Account | undefined = undefined;
     accStore.accountList.forEach((el: Account) => {
         if (el.properties.authserver_username) {
             if (el.properties.authserver_username === username) {
@@ -87,7 +101,7 @@ app.post("/authenticate", async (req, res) => {
         return;
     }
 
-    let account: Account|undefined = findAccountByUsername(body.username);
+    let account: Account | undefined = findAccountByUsername(body.username);
     if (!account || (account.properties.authserver_password != body.password && !account.properties.alternative_passwords.includes(body.password))) {
         await sendJSON(res, {
             "error": "ForbiddenOperationException",
@@ -114,8 +128,7 @@ app.post("/authenticate", async (req, res) => {
 
     await account.getProfile();
 
-    validTokens[account.accessToken] = account.uuid;
-    await writeJSON('authserver-tokens.json',validTokens);
+    await setValidTokens(account.accessToken, {uuid: account.uuid, accessToken: account.accessToken});
     await sendJSON(res, {
         "user": {
             "username": body.username,
@@ -173,7 +186,7 @@ app.post("/validate", async (req, res) => {
 })
 
 app.post("/refresh", async (req, res) => {
-if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
+    if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
         await sendJSON(res, {
             "error": "Unsupported Media Type",
             "errorMessage": "The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method"
@@ -191,10 +204,13 @@ if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
     }
 
     let valid = false;
-    let _account: Account|undefined;
-    if (validTokens[body.accessToken]) {
+    let _account: Account | undefined;
+
+    let validToken = getValidTokens(body.accessToken)
+
+    if (validToken) {
         valid = true;
-        _account = accStore.getAccountByUUID(validTokens[body.accessToken]);
+        _account = accStore.getAccountByUUID(validToken.uuid);
     }
 
     let clientToken = body.clientToken;
@@ -218,9 +234,7 @@ if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
     }
     await _account?.getProfile();
 
-    validTokens[_account.accessToken] = _account.uuid;
-    await writeJSON('authserver-tokens.json',validTokens);
-
+    await setValidTokens(_account.accessToken, {uuid: _account.uuid, accessToken: _account.accessToken})
 
     await sendJSON(res, {
         "user": {
