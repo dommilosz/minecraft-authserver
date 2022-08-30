@@ -173,7 +173,7 @@ app.post("/validate", async (req, res) => {
 })
 
 app.post("/refresh", async (req, res) => {
-    if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
+if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
         await sendJSON(res, {
             "error": "Unsupported Media Type",
             "errorMessage": "The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method"
@@ -192,9 +192,9 @@ app.post("/refresh", async (req, res) => {
 
     let valid = false;
     let _account: Account|undefined;
-    if (validTokens.state[body.accessToken]) {
+    if (validTokens[body.accessToken]) {
         valid = true;
-        _account = accStore.getAccountByUUID(validTokens.state[body.accessToken]);
+        _account = accStore.getAccountByUUID(validTokens[body.accessToken]);
     }
 
     let clientToken = body.clientToken;
