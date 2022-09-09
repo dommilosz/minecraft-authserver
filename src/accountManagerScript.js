@@ -56,20 +56,28 @@ async function addAccount(type, props) {
     let body = props;
     body["type"] = type;
 
-    let resp = await (await fetch('/authserver-addAccount', {
+    let respObj = (await fetch('/authserver-addAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
+    }));
 
-    if (resp.error && resp.errorMessage) {
-        alert(resp.error + "\n" + resp.errorMessage)
-    } else if (resp.error && resp.message) {
-        alert(resp.error + "\n" + resp.message)
-    } else {
-        alert("success");
+    let respTxt = await respObj.text();
+
+    try{
+        let resp = JSON.parse(respTxt);
+
+        if (resp.error && resp.errorMessage) {
+            alert(resp.error + "\n" + resp.errorMessage)
+        } else if (resp.error && resp.message) {
+            alert(resp.error + "\n" + resp.message)
+        } else {
+            alert("success");
+        }
+    }catch {
+        alert(respTxt);
     }
 }
 
@@ -90,14 +98,15 @@ async function accountActionUse(username) {
         code_username: username,
         action: "use"
     }
-    let resp = await (await fetch('/authserver-accountAction', {
+    let respObj = (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+
+    alert(await respObj.text());
 }
 
 async function accountActionRefresh(username) {
@@ -105,14 +114,14 @@ async function accountActionRefresh(username) {
         code_username: username,
         action: "refresh"
     }
-    let resp = await (await fetch('/authserver-accountAction', {
+    let respObj = (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 async function accountActionLogin(username) {
@@ -122,14 +131,14 @@ async function accountActionLogin(username) {
         username: prompt("username"),
         password: prompt("password"),
     }
-    let resp = await (await fetch('/authserver-accountAction', {
+    let respObj = (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 async function accountActionAuthFlow(username) {
@@ -138,14 +147,14 @@ async function accountActionAuthFlow(username) {
         action: "authFlow",
         code: prompt("code"),
     }
-    let resp = await (await fetch('/authserver-accountAction', {
+    let respObj = (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 async function accountActionGetProfile(username) {
@@ -153,14 +162,14 @@ async function accountActionGetProfile(username) {
         code_username: username,
         action: "profile",
     }
-    let resp = await (await fetch('/authserver-accountAction', {
+    let respObj = (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 async function accountActionOwnership(username) {
@@ -168,14 +177,14 @@ async function accountActionOwnership(username) {
         code_username: username,
         action: "ownership",
     }
-    let resp = await (await fetch('/authserver-accountAction', {
+    let respObj = (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 async function accountActionValidateToken(username) {
@@ -183,14 +192,14 @@ async function accountActionValidateToken(username) {
         code_username: username,
         action: "validateToken",
     }
-    let resp = await (await fetch('/authserver-accountAction', {
+    let respObj = (await fetch('/authserver-accountAction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 async function deleteAccount(username) {
@@ -198,14 +207,14 @@ async function deleteAccount(username) {
     let body = {
         code_username: username,
     }
-    let resp = await (await fetch('/authserver-removeAccount', {
+    let respObj = (await fetch('/authserver-removeAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 async function editAccount(username) {
@@ -214,14 +223,14 @@ async function editAccount(username) {
         code_username_new: prompt("new username"),
         code_password_new: prompt("new password"),
     }
-    let resp = await (await fetch('/authserver-editAccount', {
+    let respObj = (await fetch('/authserver-editAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 async function editAccountAltPasswords(username) {
@@ -230,14 +239,14 @@ async function editAccountAltPasswords(username) {
         code_username: username,
         alternative_passwords: alt_pass.length>1?alt_pass.split(";"):[],
     }
-    let resp = await (await fetch('/authserver-editAccount', {
+    let respObj = (await fetch('/authserver-editAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    })).json();
-    alert(JSON.stringify(resp));
+    }));
+    alert(await respObj.text());
 }
 
 function findAccountByUsername(username, accounts) {
@@ -317,7 +326,7 @@ async function fetchAccount() {
         let button = document.createElement("button");
         button.onclick = async ()=>{
             await btn.onClick();
-            fetchAccount()
+            await fetchAccount()
         };
         button.innerHTML = btn.text;
         button.className = `btn btn-${btn.type??"primary"}`;
