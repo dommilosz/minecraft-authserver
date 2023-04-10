@@ -7,18 +7,23 @@ async function fetchAccounts() {
     let accounts = await accountsRaw.json();
 
     let accountsDiv = document.querySelector("#accountsContainer > tbody");
-    accountsDiv.innerHTML = accounts.reduce(((prev, acc, i) => {
+    accountsDiv.innerHTML = await accounts.reduce((async (prev, acc, i) => {
         let src = cracked_icon;
         if (acc.type === 'microsoft') src = microsoft_icon;
         if (acc.type === 'mojang') src = mojang_icon;
 
-        let nick = acc?.profile?.name??"";
-        if(acc.type === 'cracked') nick = acc.username;
+        let nick = acc?.profile?.name ?? "";
+        if (acc.type === 'cracked') nick = acc.username;
 
-        return prev + `<tr>
+        //let skin = await (await fetch(`skin/${acc.uuid}`)).text();
+        let skin = ""
+        if (acc.uuid)
+            skin = `https://mc-heads.net/avatar/${acc.uuid}`
+
+        return await prev + `<tr>
             <td>${i}</td>
             <td>${acc.properties?.authserver_username ?? acc.username}</td>
-            <td>${nick}</td>
+            <td><img class="account_icon" src="${skin}">${nick}</td>
             <td><img class="account_icon" src="${src}">${acc.type}</td>
             <td><button onclick="testAccount('${acc.properties?.authserver_username}')" class="btn btn-primary btn-block">Test</button></td>
             <td><button onclick="openAccount('${acc.properties?.authserver_username}')" class="btn btn-primary btn-block">Edit</button></td>
@@ -67,7 +72,7 @@ async function addAccount(type, props) {
 
     let respTxt = await respObj.text();
 
-    try{
+    try {
         let resp = JSON.parse(respTxt);
 
         if (resp.error && resp.errorMessage) {
@@ -77,7 +82,7 @@ async function addAccount(type, props) {
         } else {
             alert("success");
         }
-    }catch {
+    } catch {
         alert(respTxt);
     }
 }
@@ -238,7 +243,7 @@ async function editAccountAltPasswords(username) {
     let alt_pass = prompt("Alt passwords separated by ;");
     let body = {
         code_username: username,
-        alternative_passwords: alt_pass.length>1?alt_pass.split(";"):[],
+        alternative_passwords: alt_pass.length > 1 ? alt_pass.split(";") : [],
     }
     let respObj = (await fetch('/authserver-editAccount', {
         method: 'POST',
@@ -314,7 +319,7 @@ async function fetchAccount() {
     buttons.push({text: "Validate", onClick: () => accountActionValidateToken(username)})
 
     buttons.push({text: "Edit", onClick: () => editAccount(username)})
-    buttons.push({text: "Remove", onClick: () => deleteAccount(username),type:"danger"})
+    buttons.push({text: "Remove", onClick: () => deleteAccount(username), type: "danger"})
     buttons.push({text: "Alt passwords", onClick: () => editAccountAltPasswords(username)})
 
     dataElement.innerHTML += `<tr>
@@ -325,12 +330,12 @@ async function fetchAccount() {
 
     buttons.forEach((btn) => {
         let button = document.createElement("button");
-        button.onclick = async ()=>{
+        button.onclick = async () => {
             await btn.onClick();
             await fetchAccount()
         };
         button.innerHTML = btn.text;
-        button.className = `btn btn-${btn.type??"primary"}`;
+        button.className = `btn btn-${btn.type ?? "primary"}`;
         button.style.marginRight = '5px'
         actionsDiv.appendChild(button);
     }, "")

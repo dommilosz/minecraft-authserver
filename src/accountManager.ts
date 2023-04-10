@@ -248,6 +248,17 @@ securedRoutes.get("/authserver.js", async(req:Request, res:Response) => {
     await sendFile(req, res, 'src/accountManagerScript.js', 200)
 })
 
+securedRoutes.get("/skin/:uuid", async(req:Request, res:Response) => {
+    let acc = accStore.getAccountByUUID(req.params.uuid);
+    if(!acc){
+        return sendText(res, "Not found", 404);
+    }
+    if(!acc.profile){
+        return sendText(res, "Profile not found", 404);
+    }
+    return sendText(res, acc.profile?.skins[0].url, 200)
+})
+
 export async function getAccountFromReq(req:Request, res:Response): Promise<Account|undefined> {
     if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
         await sendJSON(res, {
