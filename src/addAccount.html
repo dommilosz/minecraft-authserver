@@ -59,7 +59,7 @@
             </tr>
             <tr class="acc_prop_container microsoft">
                 <td></td>
-                <td><button onclick="openMSAuth()" class="btn btn-link btn-block">Authenticate with Microsoft to get Code</button></td>
+                <td><a class="btn btn-link btn-block" id="a-msauth">Authenticate with Microsoft to get Code</a></td>
             </tr>
             <tr class="acc_prop_container microsoft">
                 <td>Microsoft Code</td>
@@ -77,9 +77,10 @@
 <script>
     let msUrl = "";
     fetch('/authserver-msurl').then(r=>r.text()).then((r)=>{
-        msUrl=r
+        msUrl=r;
+        document.querySelector("#a-msauth").href = msUrl;
     })
-    changeAccountType(document.querySelector('#accountCreatorContent > div.active').id)
+    changeAccountType(document.querySelector('#accountCreatorContent > div.active').id);
 </script>
 </body>
 </html>
