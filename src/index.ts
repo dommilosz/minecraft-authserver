@@ -283,4 +283,9 @@ app.post("/refresh", async (req, res) => {
     await sendJSON(res, undefined, 200)
 })
 
+app.get("/code", async (req, res) => {
+    res.write(req.url.split("?code=")[1]);
+    res.end();
+})
+
 app.use(securedRoutes);
