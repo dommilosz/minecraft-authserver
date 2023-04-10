@@ -20,6 +20,7 @@ async function fetchAccounts() {
             <td>${acc.properties?.authserver_username ?? acc.username}</td>
             <td>${nick}</td>
             <td><img class="account_icon" src="${src}">${acc.type}</td>
+            <td><button onclick="testAccount('${acc.properties?.authserver_username}')" class="btn btn-primary btn-block">Test</button></td>
             <td><button onclick="openAccount('${acc.properties?.authserver_username}')" class="btn btn-primary btn-block">Edit</button></td>
         </tr>`
     }), "")
@@ -338,6 +339,11 @@ async function fetchAccount() {
 function openAccount(username) {
     openIframe("/authserver/view#" + username, "Edit Account: " + username);
 }
+
+async function testAccount(username) {
+    await accountActionUse(username)
+}
+
 
 function openMSAuth() {
     window.open(msUrl, "_blank").focus();
