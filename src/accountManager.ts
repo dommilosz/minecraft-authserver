@@ -159,13 +159,16 @@ securedRoutes.post("/authserver-accountAction", async(req:Request, res:Response)
             let acc: MojangAccount = _acc;
 
             if (body.action == "use") {
-                return sendJSON(res, await acc.use(), 200)
+                sendJSON(res, await acc.use(), 200);
+                return await serialize();
             }
             if (body.action == "refresh") {
-                return sendJSON(res, await acc.refresh(), 200)
+                sendJSON(res, await acc.refresh(), 200);
+                return await serialize();
             }
             if (body.action == "login") {
-                return sendJSON(res, await acc.Login(body.username, body.password, true), 200);
+                sendJSON(res, await acc.Login(body.username, body.password, true), 200);
+                return await serialize();
             }
         }
         if (_acc.type == "microsoft") {
@@ -173,10 +176,12 @@ securedRoutes.post("/authserver-accountAction", async(req:Request, res:Response)
             let acc: MicrosoftAccount = _acc;
 
             if (body.action == "use") {
-                return sendJSON(res, await acc.use(), 200)
+                sendJSON(res, await acc.use(), 200);
+                return await serialize();
             }
             if (body.action == "refresh") {
-                return sendJSON(res, await acc.refresh(), 200)
+                sendJSON(res, await acc.refresh(), 200);
+                return await serialize();
             }
             if (body.action == "authFlow") {
                 if ((!body.code)) {
@@ -186,21 +191,25 @@ securedRoutes.post("/authserver-accountAction", async(req:Request, res:Response)
                     }, 400)
                     return;
                 }
-                return sendJSON(res, await acc.authFlow(body.code), 200);
+                sendJSON(res, await acc.authFlow(body.code), 200);
+                return await serialize();
             }
         }
 
         if (body.action == "profile") {
             let resp = await _acc.getProfile()
-            return sendJSON(res, resp, 200)
+            sendJSON(res, resp, 200);
+            return await serialize();
         }
         if (body.action == "ownership") {
             let resp = await _acc.checkOwnership()
-            return sendJSON(res, resp, 200)
+            sendJSON(res, resp, 200);
+            return await serialize();
         }
         if (body.action == "validateToken") {
             let resp = await _acc.checkValidToken()
-            return sendJSON(res, resp, 200)
+            sendJSON(res, resp, 200);
+            return await serialize();
         }
 
     } catch (e:any) {
