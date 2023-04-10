@@ -1,7 +1,7 @@
 import {sendJSON} from "express-wsutils";
 import rateLimit from 'express-rate-limit'
 import express, {json} from 'express'
-import {Account, AccountsStorage, CrackedAccount, CrackedAuth, MicrosoftAuth, MojangAuth} from "minecraft-auth";
+import {Account, AccountsStorage, CrackedAuth, MicrosoftAuth, MojangAuth} from "minecraft-auth";
 import configured from "configuredjs";
 
 export const config = configured({
@@ -22,7 +22,7 @@ export const config = configured({
 })
 
 
-MicrosoftAuth.setup(config.ms.appID, config.ms.appSecret, config.ms.redirectUrl);
+MicrosoftAuth.setup({appID:config.ms.appID, redirectURL:config.ms.redirectUrl});
 
 import {readJSON, writeJSON} from "./fileSystem";
 import {securedRoutes} from "./accountManager";
@@ -128,6 +128,11 @@ app.post("/authenticate", async (req, res) => {
 
     await account.getProfile();
 
+    if(!account.accessToken || !account.uuid){
+        await sendJSON(res, {"error": "Account doesn't have required data", "errorMessage": "Access token or uuid is null"}, 403)
+        return;
+    }
+
     await setValidTokens(account.accessToken, {uuid: account.uuid, accessToken: account.accessToken});
     await sendJSON(res, {
         "user": {
@@ -228,11 +233,21 @@ app.post("/refresh", async (req, res) => {
             clientToken = CrackedAuth.uuid(_account.properties.authserver_password + ";" + _account.properties.authserver_username);
         await pacc.use();
     }
-    if (!_account || !valid) {
+    if (!valid) {
         await sendJSON(res, {"error": "IllegalArgumentException", "errorMessage": "accessToken is invalid"}, 403)
         return;
     }
+    if (!_account) {
+        await sendJSON(res, {"error": "IllegalArgumentException", "errorMessage": "Account is undefined"}, 403)
+        return;
+    }
+
     await _account?.getProfile();
+
+    if(!_account.accessToken || !_account.uuid){
+        await sendJSON(res, {"error": "Account doesn't have required data", "errorMessage": "Access token or uuid is null"}, 403)
+        return;
+    }
 
     await setValidTokens(_account.accessToken, {uuid: _account.uuid, accessToken: _account.accessToken})
 

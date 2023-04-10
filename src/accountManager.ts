@@ -74,7 +74,7 @@ securedRoutes.post("/authserver-addAccount", async (req:Request, res:Response) =
     }
 
     if (body.type === "token") {
-        pacc = new Account(body.token, "");
+        pacc = new Account(body.token, "token");
         if (await pacc.checkValidToken()) {
 
         } else {
