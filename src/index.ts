@@ -21,16 +21,16 @@ export const config = configured({
     }
 })
 
+import {readJSON, writeJSON} from "./fileSystem";
+import {securedRoutes} from "./accountManager";
+import * as Crypto from "crypto";
+
 
 MicrosoftAuth.setup({
     appID: config.ms.appID,
     redirectURL: config.ms.redirectUrl,
     appSecret: config.ms.appSecret
 });
-
-import {readJSON, writeJSON} from "./fileSystem";
-import {securedRoutes} from "./accountManager";
-import * as Crypto from "crypto";
 
 const app = express()
 export let accStore = new AccountsStorage();
@@ -57,8 +57,6 @@ readJSON("authserver-tokens.json").then(data => {
         })
     })
 });
-
-app.use(json({limit: '50mb'}));
 
 export async function deserialize() {
     let data = await readJSON("authserver-accounts.json");
@@ -89,7 +87,12 @@ const limiter = rateLimit({
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
-app.use(limiter);
+
+app.use(json({limit: '50mb'}));
+
+app.use("/authenticate",limiter);
+app.use("/validate",limiter);
+app.use("/refresh",limiter);
 
 app.post("/authenticate", async (req, res) => {
     if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
@@ -291,5 +294,6 @@ app.get("/code", async (req, res) => {
     res.write(req.url.split("?code=")[1]);
     res.end();
 })
+
 
 app.use(securedRoutes);

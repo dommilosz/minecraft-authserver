@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/authserver.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js" defer></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js" defer></script>
+
+    <!-- Bootflat's JS files.-->
+    <script src="https://bootflat.github.io/bootflat/js/icheck.min.js" defer></script>
+    <script src="https://bootflat.github.io/bootflat/js/jquery.fs.selecter.min.js" defer></script>
+    <script src="https://bootflat.github.io/bootflat/js/jquery.fs.stepper.min.js" defer></script>
+
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://bootflat.github.io/bootflat/css/bootflat.css">
+</head>
+<body>
+
+<div class="panel">
+    <div id="accountCreatorContent" class="tab-content">
+        <div class="tab-pane fade active in" id="microsoft"></div>
+        <div class="tab-pane fade" id="mojang"></div>
+        <div class="tab-pane fade" id="token"></div>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Property</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="acc_prop_container all">
+                <td>Code Username</td>
+                <td><input type="text" placeholder="code_username" id="username_input" disabled class="acc_prop all form-control" prop="code_username" style=""></td>
+            </tr>
+            <tr class="acc_prop_container mojang">
+                <td>Mojang Username</td>
+                <td><input type="text" placeholder="username" class="acc_prop mojang form-control" prop="username"></td>
+            </tr>
+            <tr class="acc_prop_container mojang">
+                <td>Mojang Password</td>
+                <td><input type="text" placeholder="password" class="acc_prop mojang form-control" prop="password"></td>
+            </tr>
+            <tr class="acc_prop_container token">
+                <td>Auth Token</td>
+                <td><input type="text" placeholder="token" class="acc_prop token form-control" prop="token"></td>
+            </tr>
+            <tr class="acc_prop_container microsoft">
+                <td></td>
+                <td><a target="_blank" class="btn btn-link btn-block" id="a-msauth">Authenticate with Microsoft to get Code</a></td>
+            </tr>
+            <tr class="acc_prop_container microsoft">
+                <td>Microsoft Code</td>
+                <td><input style="" type="text" placeholder="code" class="acc_prop microsoft form-control" prop="code"></td>
+            </tr>
+            <tr class="acc_prop_container all">
+                <td><button onclick="addAccountDOM(true)" class="btn btn-primary btn-block">Update</button></td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script>
+    let msUrl = "";
+    fetch('/authserver-msurl').then(r=>r.text()).then((r)=>{
+        msUrl=r;
+        document.querySelector("#a-msauth").href = msUrl;
+    })
+    changeAccountType(document.querySelector('#accountCreatorContent > div.active').id);
+
+    let username = "";
+    let type = "";
+    location.href.split("?")[1].split("&").forEach(prop=>{
+        let name = prop.split("=")[0]
+        let value = prop.split("=")[1]
+
+        if(name === "name") username = value;
+        if(name === "type") type = value;
+    })
+
+    document.querySelector('#username_input').value = username
+    changeAccountType(type)
+</script>
+</body>
+</html>

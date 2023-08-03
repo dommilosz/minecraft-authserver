@@ -98,6 +98,82 @@ securedRoutes.post("/authserver-addAccount", async (req:Request, res:Response) =
     await serialize();
 })
 
+securedRoutes.post("/authserver-updateAccount", async (req:Request, res:Response) => {
+    if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
+        await sendJSON(res, {
+            "error": "Unsupported Media Type",
+            "errorMessage": "The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method"
+        }, 400)
+        return;
+    }
+    let body = req.body;
+    if (!body.type) {
+        await sendJSON(res, {"error": "IllegalArgumentException", "errorMessage": "type is null"}, 400)
+        return;
+    }
+    if (!body.code_username) {
+        await sendJSON(res, {"error": "IllegalArgumentException", "errorMessage": "code credentials is null"}, 400)
+        return;
+    }
+    if (body.type === "mojang" && (!body.username || !body.password)) {
+        await sendJSON(res, {"error": "IllegalArgumentException", "errorMessage": "credentials is null"}, 400)
+        return;
+    }
+    if (body.type === "microsoft" && (!body.code)) {
+        await sendJSON(res, {"error": "IllegalArgumentException", "errorMessage": "credentials is null"}, 400)
+        return;
+    }
+    if (body.type === "token" && (!body.token)) {
+        await sendJSON(res, {"error": "IllegalArgumentException", "errorMessage": "credentials is null"}, 400)
+        return;
+    }
+
+    let acc: Account|undefined = findAccountByUsername(body.code_username);
+    if (!acc) {
+        await sendJSON(res, {"error": "ForbiddenOperationException", "errorMessage": "Account does not exists."}, 400)
+        return;
+    }
+    if (acc.type !== body.type) {
+        await sendJSON(res, {"error": "IllegalArgumentException", "errorMessage": "type is not matching the account"}, 400)
+        return;
+    }
+
+    if (body.type === "mojang") {
+        let pacc = acc as MojangAccount;
+        try {
+            await pacc.Login(body.username, body.password, true);
+        } catch (e) {
+            await sendJSON(res, e, 500)
+            return;
+        }
+    }
+    if (body.type === "microsoft") {
+        let pacc = acc as MicrosoftAccount;
+        try {
+            await pacc.authFlow(body.code);
+        } catch (e) {
+            await sendJSON(res, e, 500)
+            return;
+        }
+    }
+
+    if (body.type === "token") {
+        let pacc = acc as Account;
+        if (await pacc.checkValidToken()) {
+
+        } else {
+            await sendJSON(res, {
+                "error": "ForbiddenOperationException",
+                "errorMessage": "Invalid credentials. Invalid token."
+            }, 400)
+            return;
+        }
+    }
+
+    await sendCompletion(res, "updated!", false, 200);
+    await serialize();
+})
+
 securedRoutes.post("/authserver-removeAccount", async (req:Request, res:Response) => {
     if (!req.header("Content-Type")?.toLowerCase()?.includes("application/json")) {
         await sendJSON(res, {
@@ -239,6 +315,11 @@ securedRoutes.get("/", async(req:Request, res:Response) => {
 securedRoutes.get("/authserver/add", async(req:Request, res:Response) => {
     await sendFile(req, res, 'src/addAccount.html', 200)
 })
+
+securedRoutes.get("/authserver/update", async(req:Request, res:Response) => {
+    await sendFile(req, res, 'src/updateAccount.html', 200)
+})
+
 securedRoutes.get("/authserver/view", async(req:Request, res:Response) => {
     await sendFile(req, res, 'src/accountView.html', 200)
 })

@@ -45,7 +45,7 @@ function changeAccountType(type) {
     document.querySelectorAll(".acc_prop_container.all").forEach(el => el.style.display = '');
 }
 
-async function addAccountDOM() {
+async function addAccountDOM(update) {
     let json = {};
     let props = document.querySelectorAll(`.acc_prop.${selectedAccountType}`);
     props.forEach(el => {
@@ -55,14 +55,19 @@ async function addAccountDOM() {
     props2.forEach(el => {
         json[el.getAttribute("prop")] = el.value;
     })
-    return await addAccount(selectedAccountType, json);
+    return await addAccount(selectedAccountType, json, update);
 }
 
-async function addAccount(type, props) {
+async function addAccount(type, props, update) {
     let body = props;
     body["type"] = type;
 
-    let respObj = (await fetch('/authserver-addAccount', {
+    let url = '/authserver-addAccount';
+    if(update){
+        url = '/authserver-updateAccount'
+    }
+
+    let respObj = (await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -71,6 +76,11 @@ async function addAccount(type, props) {
     }));
 
     let respTxt = await respObj.text();
+
+    if(respObj.status !== 200){
+        alert(respTxt);
+        return;
+    }
 
     try {
         let resp = JSON.parse(respTxt);
@@ -88,13 +98,19 @@ async function addAccount(type, props) {
 }
 
 function openIframe(url, title) {
+    let iframe = document.querySelector("#iframe");
+    if(!iframe){
+        location.href = url;
+        return;
+    }
+
     if (url === '') {
-        document.querySelector("#iframe").src = url;
+        iframe.src = url;
         document.querySelector("#iframe_container").style.display = 'none';
         fetchAccounts();
         return;
     }
-    document.querySelector("#iframe").src = url;
+    iframe.src = url;
     document.querySelector("#iframe_container").style.display = 'block';
     document.querySelector("#iframe-panel-title-text").innerText = title;
 }
@@ -148,10 +164,13 @@ async function accountActionLogin(username) {
 }
 
 async function accountActionAuthFlow(username) {
+    let code = prompt("code");
+    if(!code)return;
+
     let body = {
         code_username: username,
         action: "authFlow",
-        code: prompt("code"),
+        code,
     }
     let respObj = (await fetch('/authserver-accountAction', {
         method: 'POST',
@@ -321,6 +340,7 @@ async function fetchAccount() {
     buttons.push({text: "Edit", onClick: () => editAccount(username)})
     buttons.push({text: "Remove", onClick: () => deleteAccount(username), type: "danger"})
     buttons.push({text: "Alt passwords", onClick: () => editAccountAltPasswords(username)})
+    buttons.push({text: "Update", onClick: () => openIframe(`/authserver/update?name=${username}&type=${account.type}`,'Add Account')})
 
     dataElement.innerHTML += `<tr>
 <td>Actions:</td>
