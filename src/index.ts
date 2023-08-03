@@ -22,7 +22,11 @@ export const config = configured({
 })
 
 
-MicrosoftAuth.setup({appID:config.ms.appID, redirectURL:config.ms.redirectUrl});
+MicrosoftAuth.setup({
+    appID: config.ms.appID,
+    redirectURL: config.ms.redirectUrl,
+    appSecret: config.ms.appSecret
+});
 
 import {readJSON, writeJSON} from "./fileSystem";
 import {securedRoutes} from "./accountManager";
