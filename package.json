@@ -13,15 +13,15 @@
   "license": "ISC",
   "dependencies": {
     "configuredjs": "^1.0.6",
-    "express": "^4.18.1",
+    "express": "^4.18.2",
     "express-basic-auth": "^1.2.1",
-    "express-rate-limit": "^6.5.2",
+    "express-rate-limit": "^7.1.5",
     "express-wsutils": "^1.0.2",
-    "firebase-admin": "^11.0.1",
-    "minecraft-auth": "^2.0.2"
+    "firebase-admin": "^12.0.0",
+    "minecraft-auth": "^2.0.6"
   },
   "devDependencies": {
-    "ts-node": "^10.9.1",
-    "typescript": "^4.7.4"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }
